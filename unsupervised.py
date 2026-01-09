@@ -1,7 +1,6 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import silhouette_score
 from sklearn.cluster import KMeans,DBSCAN
@@ -16,9 +15,20 @@ class Model_train:
         df=df.drop("person_default",axis=1)
         
         scaler=StandardScaler()
-        scaler.fit_transform(df)
+        scaled_df=scaler.fit_transform(df)
+        
+        ssd=[]
+        silhoute_score=[]
         
         for i in range(2,30):
             
             model=KMeans(n_clusters=i)
-            model.fit()
+            cluster_labels=model.fit(scaled_df)
+            ssd.append(model.inertia_)
+            score=silhouette_score(scaled_df,cluster_labels)
+            silhoute_score.append(score)
+        
+        plt.figure(figsize=(10,6))
+        plt.plot(range(2,30),ssd,"--o")
+        plt.show()
+            
