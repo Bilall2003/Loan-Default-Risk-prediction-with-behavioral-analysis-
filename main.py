@@ -1,36 +1,26 @@
 from data_load import Load_File
 from data_clean import Cleaner
 from config import CSV_PATH
-from unsupervised import Model_train
+from FE import Feature_eng
+from unsupervised import unsupervised_Model_train
 
 def main():
     
     
-    def load():
-        
-        file_path=CSV_PATH
-        obj1=Load_File()
-        df=obj1.load(file_path)
-        
-        return df
-    
-    df=load()
-    
-    def clean():
-        
-        obj2=Cleaner()
-        df_clean=obj2.clean(df)
-        return df_clean
-        
-    df=clean()
-    
-    def model_train():
-        
-        obj3=Model_train()
-        obj3.model(df)
-    
-    model_train()    
-    
+    obj1 = Load_File()
+    df_original = obj1.load(CSV_PATH)
+
+    obj2 = Cleaner()
+    df_clean = obj2.clean(df_original)
+
+    obj3 = Feature_eng()
+    scaled_df = obj3.FE(df_clean)
+
+    obj4 = unsupervised_Model_train()
+    pca_df = obj4.pca_model(scaled_df)
+
+    df_final = obj4.cluster_model(pca_df, df_clean)
+
     
 if __name__=="__main__":
     
