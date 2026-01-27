@@ -3,6 +3,7 @@ from data_clean import Cleaner
 from config import CSV_PATH
 from FE import Feature_eng
 from unsupervised import unsupervised_Model_train
+from supervised import supervised_model_train
 
 def main():
     
@@ -19,7 +20,11 @@ def main():
     obj4 = unsupervised_Model_train()
     pca_df = obj4.pca_model(scaled_df)
 
-    df_final = obj4.cluster_model(pca_df, df_clean)
+    cluster_df = obj4.cluster_model(pca_df, df_clean)
+    
+    obj5=supervised_model_train()
+    obj5.FE(cluster_df)
+    obj5.predict()
 
     
 if __name__=="__main__":
