@@ -4,12 +4,6 @@ from config import ENGINE
 import logging
 from sklearn.preprocessing import OneHotEncoder,StandardScaler,LabelEncoder
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC
-from sklearn.ensemble import AdaBoostClassifier
-from xgboost import XGBClassifier
 from sklearn.model_selection import train_test_split,GridSearchCV,cross_validate
 from sklearn.metrics import classification_report,confusion_matrix,ConfusionMatrixDisplay,accuracy_score,roc_auc_score,RocCurveDisplay,make_scorer,precision_score,recall_score
 from sklearn.pipeline import Pipeline
