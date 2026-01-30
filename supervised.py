@@ -1,10 +1,15 @@
-
 import numpy as np
 import pandas as pd
 from config import ENGINE
 import logging
 from sklearn.preprocessing import OneHotEncoder,StandardScaler,LabelEncoder
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.ensemble import AdaBoostClassifier
+from xgboost import XGBClassifier
 from sklearn.model_selection import train_test_split,GridSearchCV,cross_validate
 from sklearn.metrics import classification_report,confusion_matrix,ConfusionMatrixDisplay,accuracy_score,roc_auc_score,RocCurveDisplay,make_scorer,precision_score,recall_score
 from sklearn.pipeline import Pipeline
@@ -63,18 +68,18 @@ class supervised_model_train:
             X=self.df_final.drop(["cluster_name","person_default"],axis=1)
             Y=self.df_final["person_default"]
             
-            X_train,X_test,y_train,y_test=train_test_split(X,Y,train_size=0.7,random_state=101)
+            self.X_train,self.X_test,self.y_train,self.y_test=train_test_split(X,Y,train_size=0.7,random_state=101)
             
             scaler=StandardScaler()
-            scaled_xtrain=scaler.fit_transform(X_train)
-            scaled_xtest=scaler.transform(X_test)
+            scaled_xtrain=scaler.fit_transform(self.X_train)
+            scaled_xtest=scaler.transform(self.X_test)
             
             model=[LogisticRegression(solver="saga",class_weight="balanced"),RandomForestClassifier(class_weight="balanced"),
                    DecisionTreeClassifier(class_weight="balanced"),KNeighborsClassifier(),SVC(class_weight="balanced"),AdaBoostClassifier()]
             
             # making pos_label readable by giving label Y/N instead it read 1/0 which are not available in label column
-            recall = make_scorer(recall_score, pos_label='Y', zero_division=0)
-            precision = make_scorer(precision_score, pos_label='Y', zero_division=0)
+            self.recall = make_scorer(recall_score, pos_label='Y', zero_division=0)
+            self.precision = make_scorer(precision_score, pos_label='Y', zero_division=0)
             
             # cross validation on all models
             # for i in model:
@@ -87,8 +92,15 @@ class supervised_model_train:
             #     logging.info(score_df.mean())
             
             
-            # choosinh logreg for final implementation and deploying it using pipeline
+        except Exception as e:
             
+            logging.error(e)
+            
+            # choosinh logreg for final implementation and deploying it using pipeline
+    def final_model(self):
+        
+        try:
+        
             operation=Pipeline([("scaler",StandardScaler()),
             ("model",LogisticRegression(solver="saga",class_weight="balanced"))])
         
@@ -97,25 +109,27 @@ class supervised_model_train:
                 "model__C":np.logspace(-4,4,15)                
             }
             
-            grid_model=GridSearchCV(estimator=operation,param_grid=para,cv=5,scoring=precision,n_jobs=-1,verbose=2)
-            grid_model.fit(X_train,y_train)
+            grid_model=GridSearchCV(estimator=operation,param_grid=para,cv=5,scoring=self.precision,n_jobs=-1,verbose=2)
+            grid_model.fit(self.X_train,self.y_train)
             
             logging.info(grid_model.best_estimator_)
             logging.info(grid_model.best_params_)
             logging.info(grid_model.best_score_)
             
-            pre=grid_model.predict(X_test)
-            prob_pre=grid_model.predict_proba(X_test)[: ,1]
+            pre=grid_model.predict(self.X_test)
+            prob_pre=grid_model.predict_proba(self.X_test)[: ,1]
             
-            cr=classification_report(y_test,pre)
+            cr=classification_report(self.y_test,pre)
             print(cr)
             
-            ConfusionMatrixDisplay.from_predictions(y_test,pre)
+            ConfusionMatrixDisplay.from_predictions(self.y_test,pre)
             
-            ytest_label=pd.get_dummies(y_test,drop_first=True)
+            ytest_label=pd.get_dummies(self.y_test,drop_first=True)
             
             RocCurveDisplay.from_predictions(ytest_label,prob_pre)
             plt.show()
+            
+            return grid_model
             
             
         except Exception as e:
