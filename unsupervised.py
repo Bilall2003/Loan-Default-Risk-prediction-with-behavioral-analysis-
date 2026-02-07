@@ -90,7 +90,7 @@ class unsupervised_Model_train:
             # plt.plot(range(2,30),ssd,"--o")
             # plt.show()
             
-            n_clusters=10
+            n_clusters=2
             logging.info("Final implementation of KMEANS")
             final_model=KMeans(n_clusters=n_clusters,random_state=101,init="k-means++")
             label_clusters=final_model.fit_predict(pca_df)
