@@ -173,6 +173,5 @@ This project is licensed under the terms of the LICENSE file included in the rep
 
 ---
 
-
 If you like this project, consider giving it a ⭐ on GitHub.
-# Loan-Default-Risk-prediction-with-behavioral-analysis-
+
